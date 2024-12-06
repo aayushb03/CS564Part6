@@ -6,9 +6,11 @@
 /* create relations */
 create table soaps(soapid int, name char(28), network char(4), rating real);
 load table soaps from ("../data/soaps.data");
+print table soaps;
 
 create table stars(starid int, real_name char(20), plays char(12), soapid int);
 load table stars from ("../data/stars.data");
+print table stars;
 
 /*
  * various selections without indices
@@ -16,7 +18,6 @@ load table stars from ("../data/stars.data");
 
 /* simple selection (should be the same as just printing the relation) */
 select soapid, name, network, rating from soaps;
-print table soaps;
 
 /* names, ratings, and networks of soaps on NBC */
 select name, rating, network from soaps where network = "NBC";
