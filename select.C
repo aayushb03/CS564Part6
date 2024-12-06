@@ -89,17 +89,15 @@ const Status ScanSelect(const string & result,
     InsertFileScan resultInsert(result, status);
     if (status != OK) return status;
 
-    Record rec;     // Record to hold each tuple
-    RID rid;        // Record ID
+    Record rec;
+    RID rid;
     while (sourceScan.scanNext(rid) == OK) {
         status = sourceScan.getRecord(rec);
         if (status != OK) return status;
 
-        // Allocate memory for the projected tuple
         char *projTuple = new char[reclen];
         int offset = 0;
 
-        // Perform projection on the fly
         for (int i = 0; i < projCnt; i++) {
             memcpy(projTuple + offset,
                    rec.data + projNames[i].attrOffset,
@@ -107,7 +105,6 @@ const Status ScanSelect(const string & result,
             offset += projNames[i].attrLen;
         }
 
-        // Insert the projected tuple into the result relation
         Record projectedRec;
         projectedRec.data = projTuple;
         projectedRec.length = reclen;
@@ -117,7 +114,6 @@ const Status ScanSelect(const string & result,
         if (status != OK) return status;
     }
 
-    // End the scan and return success
     sourceScan.endScan();
     return OK;
 }
