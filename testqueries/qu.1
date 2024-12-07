@@ -23,7 +23,7 @@ select soapid, name, network, rating from soaps;
 select name, rating, network from soaps where network = "NBC";
 
 /* print character name, real name, and ids of stars with id's < 12 */
-select plays, real_name, starid from stars where soapid = 6;
+select plays, real_name, starid from stars where starid < 12;
 
 /* ratings, networks, and names of soaps with ratings of 5 or greater */
 select rating, network, name from soaps where rating >= 5.0;
