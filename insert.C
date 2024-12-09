@@ -37,8 +37,6 @@ const Status QU_Insert(const string & relation,
     }
 
     // Step 4: Validate the number of attributes
-    cout << "Number of attributes in catalog: " << attrCount << endl;
-    cout << "Number of attributes in input: " << attrCnt << endl;
     if (attrCnt != attrCount) {
         delete[] attrs; // Clean up allocated memory
         return ATTRTYPEMISMATCH; // Mismatch in attribute count
@@ -56,6 +54,7 @@ const Status QU_Insert(const string & relation,
         // Locate the corresponding attribute in the catalog
         int j;
         for (j = 0; j < attrCount; j++) {
+            cout << "Comparing " << attrs[j].attrName << " with " << attrList[i].attrName << endl;
             if (attrs[j].attrName == attrList[i].attrName) {
                 break;
             }
