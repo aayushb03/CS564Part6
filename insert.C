@@ -55,7 +55,7 @@ const Status QU_Insert(const string & relation,
         int j;
         for (j = 0; j < attrCount; j++) {
             cout << "Comparing " << attrs[j].attrName << " with " << attrList[i].attrName << endl;
-            if (attrs[j].attrName == attrList[i].attrName) {
+            if (strcmp(attrs[j].attrName, attrList[i].attrName) == 0) {
                 break;
             }
         }
