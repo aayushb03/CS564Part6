@@ -72,7 +72,17 @@ const Status QU_Insert(const string & relation,
             return ATTRTYPEMISMATCH;
         }
 
-        memcpy(recordData + attrs[j].attrOffset, attrList[i].attrValue, attrs[j].attrLen);
+        switch (attrs[j].attrType) {
+            case INTEGER:
+                memcpy(recordData + attrs[j].attrOffset, &attrList[i].attrValue, sizeof(int));
+                break;
+            case FLOAT:
+                memcpy(recordData + attrs[j].attrOffset, &attrList[i].attrValue, sizeof(float));
+                break;
+            case STRING:
+                memcpy(recordData + attrs[j].attrOffset, attrList[i].attrValue, attrs[j].attrLen);
+                break;
+        }
     }
 
     // Wrap the record data in a Record object
