@@ -45,7 +45,7 @@ const Status QU_Select(const string & result,
         attrDesc = new AttrDesc;
         status = attrCat->getInfo(attr->relName, attr->attrName, *attrDesc);
         if (status != OK) {
-            delete attrDesc;
+//            delete attrDesc;
             return status;
         }
     }
@@ -60,7 +60,7 @@ const Status QU_Select(const string & result,
     status = ScanSelect(result, projCnt, projDesc, attrDesc, op, attrValue, reclen);
 
     // Clean up
-    delete attrDesc;
+//    delete attrDesc;
     return status;
 }
 
