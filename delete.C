@@ -24,7 +24,7 @@ const Status QU_Delete(const string & relation,
 
     AttrDesc attrDesc;
     status = attrCat->getInfo(relation, attrName, attrDesc);
-    if (status != OK) {
+    if (status != OK or attrName.empty()) {
         return status;
     }
 
@@ -39,14 +39,12 @@ const Status QU_Delete(const string & relation,
         case STRING:
             filterValue = (char *)attrValue; // Assume filter is a null-terminated string
             break;
-        default:
-            return ATTRTYPEMISMATCH;
     }
 
     status = fileScan.startScan(attrDesc.attrOffset,
                                 attrDesc.attrLen,
                                 type,
-                                nullptr,
+                                filterValue,
                                 op);
     if (status != OK) {
         return status;
