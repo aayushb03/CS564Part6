@@ -15,6 +15,7 @@ const Status QU_Insert(const string & relation,
 	const int attrCnt, 
 	const attrInfo attrList[])
 {
+    cout << "Inserting record into relation " << relation << endl;
     // Step 1: Validate input
     if (relation.empty() || attrCnt <= 0 || attrList == nullptr) {
         return BADCATPARM; // Return error code for bad input
