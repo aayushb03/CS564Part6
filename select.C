@@ -27,7 +27,7 @@ const Status QU_Select(const string & result,
 		       const char *attrValue)
 {
    // Qu_Select sets up things and then calls ScanSelect to do the actual work
-    cout << "Doing QU_Select " << endl;
+    cout << "Doing QU_Select with " << attrValue << endl;
     AttrDesc *projAttrs = new AttrDesc[projCnt];
 
     for (int i = 0; i < projCnt; i++) {
@@ -53,6 +53,7 @@ const Status QU_Select(const string & result,
     for (int i = 0; i < projCnt; i++) {
         reclen += projAttrs[i].attrLen;
     }
+
 
     Status status = ScanSelect(result, projCnt, projAttrs, attrDesc, op, attrValue, reclen);
 
