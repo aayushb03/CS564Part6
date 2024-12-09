@@ -107,11 +107,11 @@ const Status ScanSelect(const string & result,
 
         status = scan.startScan(offset, length, type, filterValue, op);
         if (status != OK) {
-//            delete filterValue;
+            delete filterValue;
             return status;
         }
 
-//        delete filterValue;
+        delete filterValue;
     }
 
     // Set up the output relation
