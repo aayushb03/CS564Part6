@@ -46,7 +46,7 @@ const Status QU_Delete(const string & relation,
     status = fileScan.startScan(attrDesc.attrOffset,
                                 attrDesc.attrLen,
                                 type,
-                                filterValue,
+                                nullptr,
                                 op);
     if (status != OK) {
         return status;
