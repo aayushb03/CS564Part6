@@ -15,78 +15,84 @@ const Status QU_Insert(const string & relation,
 	const int attrCnt, 
 	const attrInfo attrList[])
 {
+    // Step 1: Validate input
+    if (relation.empty() || attrCnt <= 0 || attrList == nullptr) {
+        return BADCATPARM; // Return error code for bad input
+    }
+
+    // Step 2: Fetch the relation metadata from the catalog
     RelDesc relDesc;
     Status status = relCat->getInfo(relation, relDesc);
     if (status != OK) {
-        return status; // Relation not found
+        return status; // Return the error if relation doesn't exist
     }
 
-    // Retrieve attributes of the relation
-    AttrDesc *attrDesc;
-    int relAttrCnt;
-    status = attrCat->getRelInfo(relation, relAttrCnt, attrDesc);
+    // Step 3: Fetch the attributes for the relation
+    AttrDesc *attrs;
+    int attrCount;
+    status = attrCat->getRelInfo(relation, attrCount, attrs);
     if (status != OK) {
-        return status; // Error retrieving attributes
+        return status; // Return the error if attributes can't be fetched
     }
 
-    // Validate attribute count
-    if (attrCnt != relAttrCnt) {
-        return ATTRNOTFOUND;
+    // Step 4: Validate the number of attributes
+    if (attrCnt != attrCount) {
+        delete[] attrs; // Clean up allocated memory
+        return ATTRTYPEMISMATCH; // Mismatch in attribute count
     }
 
-    // Allocate memory for the record
-    int recordLength = 0;
-    for (int i = 0; i < relAttrCnt; ++i) {
-        recordLength += attrDesc[i].attrLen;
+    // Step 5: Create the record
+    int recordSize = 0; // Calculate the record size dynamically
+    for (int i = 0; i < attrCnt; i++) {
+        recordSize += attrs[i].attrLen;
     }
-    char *recordData = new char[recordLength];
-    memset(recordData, 0, recordLength); // Initialize memory
+    char *recordData = new char[recordSize]; // Allocate memory for the record
+    memset(recordData, 0, recordSize); // Initialize memory
 
-    // Copy attribute values into the record
-    for (int i = 0; i < attrCnt; ++i) {
-        const attrInfo &attr = attrList[i];
-        bool found = false;
-
-        // Find the attribute in the relation schema
-        for (int j = 0; j < relAttrCnt; ++j) {
-            if (attrDesc[j].attrName == attr.attrName) {
-                // Validate attribute type
-                if (attrDesc[j].attrType != attr.attrType) {
-                    delete[] recordData;
-                    return ATTRTYPEMISMATCH;
-                }
-
-                // Copy the attribute value into the record
-                memcpy(recordData + attrDesc[j].attrOffset, attr.attrValue, attrDesc[j].attrLen);
-                found = true;
+    for (int i = 0; i < attrCnt; i++) {
+        // Locate the corresponding attribute in the catalog
+        int j;
+        for (j = 0; j < attrCount; j++) {
+            if (attrs[j].attrName == attrList[i].attrName) {
                 break;
             }
         }
-
-        if (!found) {
-            delete[] recordData;
-            return ATTRNOTFOUND; // Attribute not in schema
+        if (j == attrCount) { // Attribute not found
+            delete[] recordData; // Free allocated memory
+            delete[] attrs; // Clean up
+            return ATTRTYPEMISMATCH;
         }
+
+        // Validate and copy the value into the record
+        if (attrs[j].attrType != attrList[i].attrType) {
+            delete[] recordData;
+            delete[] attrs;
+            return ATTRTYPEMISMATCH;
+        }
+
+        memcpy(recordData + attrs[j].attrOffset, attrList[i].attrValue, attrs[j].attrLen);
     }
 
-    // Open heap file for the relation
-    Status heapStatus;
-    InsertFileScan heapFile(relation, heapStatus);
-    if (heapStatus != OK) {
-        delete[] recordData;
-        return heapStatus; // Error opening heap file
+    // Wrap the record data in a Record object
+    Record rec;
+    rec.data = recordData;
+    rec.length = recordSize;
+
+    // Step 6: Insert the record into the heap file
+    InsertFileScan heapFile(relation, status);
+    if (status != OK) {
+        delete[] recordData; // Free allocated memory
+        delete[] attrs;
+        return status;
     }
 
-    // Insert the record into the heap file
-    RID rid;
-    Record newRecord = {recordData, recordLength};
-    heapStatus = heapFile.insertRecord(newRecord, rid);
-    delete[] recordData; // Free allocated memory
+    RID outRid;
+    status = heapFile.insertRecord(rec, outRid);
 
-    if (heapStatus != OK) {
-        return heapStatus; // Error inserting record
-    }
+    // Step 7: Clean up
+    delete[] recordData;
+    delete[] attrs;
 
-    return OK;
+    return status;
 }
 
