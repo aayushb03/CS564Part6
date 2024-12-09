@@ -28,10 +28,25 @@ const Status QU_Delete(const string & relation,
         return status;
     }
 
+    char *filterValue = nullptr;
+    switch (type) {
+        case INTEGER:
+            filterValue = (char*) new int(atoi(attrValue));
+            break;
+        case FLOAT:
+            filterValue = (char*) new float(atof(attrValue));
+            break;
+        case STRING:
+            filterValue = (char *)attrValue; // Assume filter is a null-terminated string
+            break;
+        default:
+            return ATTRTYPEMISMATCH;
+    }
+
     status = fileScan.startScan(attrDesc.attrOffset,
                                 attrDesc.attrLen,
                                 type,
-                                attrValue,
+                                filterValue,
                                 op);
     if (status != OK) {
         return status;
