@@ -81,6 +81,13 @@ const Status ScanSelect(const string & result,
     if (status != OK) return status;
 
     if (attrDesc) {
+        if ((Datatype)attrDesc->attrType == INTEGER){
+            int value = atoi(filter);
+            filter = (char*)&value;
+        } else if ((Datatype)attrDesc->attrType == FLOAT){
+            float value = atof(filter);
+            filter = (char*)&value;
+        }
         status = sourceScan.startScan(attrDesc->attrOffset, attrDesc->attrLen,
                                       (Datatype)attrDesc->attrType, filter, op);
         if (status != OK) return status;
