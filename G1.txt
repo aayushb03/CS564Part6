@@ -1,0 +1,5 @@
+After reading over the project independently, we all met together on 12/06 to clear up any misunderstandings and begin work on the select.C functionality
+On 12/08 and 12/09, we also all met to finish the code for all files, validating that the tests are correct.
+
+We pair programmed, while one of us was responsible for error lookup and answering questions.
+Preston drove fro the select.C, Dane drove for the delete.C, and Aayush drove for the insert.C 
