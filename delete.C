@@ -37,7 +37,7 @@ const Status QU_Delete(const string & relation,
             filterValue = (char*) new float(atof(attrValue));
             break;
         case STRING:
-            filterValue = (char *)attrValue; // Assume filter is a null-terminated string
+            filterValue = (char *)attrValue;
             break;
     }
 

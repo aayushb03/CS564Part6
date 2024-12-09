@@ -16,55 +16,48 @@ const Status QU_Insert(const string & relation,
 	const attrInfo attrList[])
 {
     cout << "Inserting record into relation " << relation << endl;
-    // Step 1: Validate input
     if (relation.empty() || attrCnt <= 0 || attrList == nullptr) {
-        return BADCATPARM; // Return error code for bad input
+        return BADCATPARM;
     }
 
-    // Step 2: Fetch the relation metadata from the catalog
     RelDesc relDesc;
     Status status = relCat->getInfo(relation, relDesc);
     if (status != OK) {
-        return status; // Return the error if relation doesn't exist
+        return status;
     }
 
-    // Step 3: Fetch the attributes for the relation
     AttrDesc *attrs;
     int attrCount;
     status = attrCat->getRelInfo(relation, attrCount, attrs);
     if (status != OK) {
-        return status; // Return the error if attributes can't be fetched
+        return status;
     }
 
-    // Step 4: Validate the number of attributes
     if (attrCnt != attrCount) {
-        delete[] attrs; // Clean up allocated memory
-        return ATTRTYPEMISMATCH; // Mismatch in attribute count
+        delete[] attrs;
+        return ATTRTYPEMISMATCH;
     }
 
-    // Step 5: Create the record
-    int recordSize = 0; // Calculate the record size dynamically
+    int recordSize = 0;
     for (int i = 0; i < attrCnt; i++) {
         recordSize += attrs[i].attrLen;
     }
-    char *recordData = new char[recordSize]; // Allocate memory for the record
-    memset(recordData, 0, recordSize); // Initialize memory
+    char *recordData = new char[recordSize];
+    memset(recordData, 0, recordSize);
 
     for (int i = 0; i < attrCnt; i++) {
-        // Locate the corresponding attribute in the catalog
         int j;
         for (j = 0; j < attrCount; j++) {
             if (strcmp(attrs[j].attrName, attrList[i].attrName) == 0) {
                 break;
             }
         }
-        if (j == attrCount) { // Attribute not found
-            delete[] recordData; // Free allocated memory
-            delete[] attrs; // Clean up
+        if (j == attrCount) {
+            delete[] recordData;
+            delete[] attrs;
             return ATTRTYPEMISMATCH;
         }
 
-        // Validate and copy the value into the record
         if (attrs[j].attrType != attrList[i].attrType) {
             delete[] recordData;
             delete[] attrs;
@@ -75,31 +68,26 @@ const Status QU_Insert(const string & relation,
         float floatValue = 0.0f;
         switch (attrs[j].attrType) {
             case INTEGER:
-                // Convert to int and copy into recordData
                 intValue = atoi((const char*)attrList[i].attrValue);
                 memcpy(recordData + attrs[j].attrOffset, &intValue, sizeof(int));
                 break;
             case FLOAT:
-                // Convert to float and copy into recordData
                 floatValue = atof((const char*)attrList[i].attrValue);
                 memcpy(recordData + attrs[j].attrOffset, &floatValue, sizeof(float));
                 break;
             case STRING:
-                // Directly copy the string value into recordData
                 memcpy(recordData + attrs[j].attrOffset, attrList[i].attrValue, attrs[j].attrLen);
                 break;
         }
     }
 
-    // Wrap the record data in a Record object
     Record rec;
     rec.data = recordData;
     rec.length = recordSize;
 
-    // Step 6: Insert the record into the heap file
     InsertFileScan heapFile(relation, status);
     if (status != OK) {
-        delete[] recordData; // Free allocated memory
+        delete[] recordData;
         delete[] attrs;
         return status;
     }
@@ -107,7 +95,6 @@ const Status QU_Insert(const string & relation,
     RID outRid;
     status = heapFile.insertRecord(rec, outRid);
 
-    // Step 7: Clean up
     delete[] recordData;
     delete[] attrs;
 
