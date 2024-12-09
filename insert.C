@@ -54,7 +54,6 @@ const Status QU_Insert(const string & relation,
         // Locate the corresponding attribute in the catalog
         int j;
         for (j = 0; j < attrCount; j++) {
-            cout << "Comparing " << attrs[j].attrName << " with " << attrList[i].attrName << endl;
             if (strcmp(attrs[j].attrName, attrList[i].attrName) == 0) {
                 break;
             }
@@ -72,14 +71,21 @@ const Status QU_Insert(const string & relation,
             return ATTRTYPEMISMATCH;
         }
 
+        int intValue = 0;
+        float floatValue = 0.0f;
         switch (attrs[j].attrType) {
             case INTEGER:
-                memcpy(recordData + attrs[j].attrOffset, &attrList[i].attrValue, sizeof(int));
+                // Convert to int and copy into recordData
+                intValue = atoi((const char*)attrList[i].attrValue);
+                memcpy(recordData + attrs[j].attrOffset, &intValue, sizeof(int));
                 break;
             case FLOAT:
-                memcpy(recordData + attrs[j].attrOffset, &attrList[i].attrValue, sizeof(float));
+                // Convert to float and copy into recordData
+                floatValue = atof((const char*)attrList[i].attrValue);
+                memcpy(recordData + attrs[j].attrOffset, &floatValue, sizeof(float));
                 break;
             case STRING:
+                // Directly copy the string value into recordData
                 memcpy(recordData + attrs[j].attrOffset, attrList[i].attrValue, attrs[j].attrLen);
                 break;
         }
