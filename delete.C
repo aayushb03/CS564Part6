@@ -24,7 +24,7 @@ const Status QU_Delete(const string & relation,
 
     AttrDesc attrDesc;
     status = attrCat->getInfo(relation, attrName, attrDesc);
-    if (status != OK or attrName.empty()) {
+    if (status != OK and !attrName.empty()) {
         return status;
     }
 
