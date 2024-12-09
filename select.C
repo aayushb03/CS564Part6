@@ -45,7 +45,6 @@ const Status QU_Select(const string & result,
         attrDesc = new AttrDesc;
         status = attrCat->getInfo(attr->relName, attr->attrName, *attrDesc);
         if (status != OK) {
-//            delete attrDesc;
             return status;
         }
     }
@@ -60,7 +59,6 @@ const Status QU_Select(const string & result,
     status = ScanSelect(result, projCnt, projDesc, attrDesc, op, attrValue, reclen);
 
     // Clean up
-//    delete attrDesc;
     return status;
 }
 
@@ -107,11 +105,9 @@ const Status ScanSelect(const string & result,
 
         status = scan.startScan(offset, length, type, filterValue, op);
         if (status != OK) {
-            delete filterValue;
             return status;
         }
 
-        delete filterValue;
     }
 
     // Set up the output relation
@@ -142,11 +138,9 @@ const Status ScanSelect(const string & result,
         RID outRID;
         status = resultScan.insertRecord(outputRec, outRID);
         if (status != OK) {
-//            delete[] outputData;
             return status;
         }
     }
 
-//    delete[] outputData;
     return OK;
 }
